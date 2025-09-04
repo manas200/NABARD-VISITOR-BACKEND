@@ -1,10 +1,20 @@
 const express = require("express");
-const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const dotenv = require("dotenv");
 dotenv.config();
-app.use(cors());
+const cors = require("cors");
+
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "https://nabard-visitor-frontend.vercel.app/",
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // In-memory (abhi bas demo k liye)

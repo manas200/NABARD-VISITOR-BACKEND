@@ -59,6 +59,35 @@ app.post("/api/receive-coordinates", async (req, res) => {
   }
 });
 
+//to get the specific farmer coordinates
+app.get("/api/get-coordinates/:farmerId", async (req, res) => {
+  try {
+    const { farmerId } = req.params;
+
+    if (!farmerId) {
+      return res.status(400).json({
+        error: "Farmer ID is required",
+      });
+    }
+
+    const farmerCoordinates = receivedData.filter(
+      (entry) => entry.farmerId === farmerId
+    );
+
+    if (farmerCoordinates.length === 0) {
+      return res.status(404).json({
+        error: "No coordinates found for this farmer ID",
+      });
+    }
+
+    res.json(farmerCoordinates);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
+
 // // to get the latest coordinates
 app.get("/api/get-coordinates", async (req, res) => {
   try {

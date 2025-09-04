@@ -8,7 +8,8 @@ const cors = require("cors");
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://nabard-visitor-frontend.vercel.app/",
+    "https://nabard-visitor-frontend.vercel.app",
+    "https://nabard-visitor-frontend-git-main-manas-chaturvedis-projects.vercel.app",
   ],
   credentials: true,
   optionsSuccessStatus: 200,

@@ -20,8 +20,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-const cron = require("node-cron");
-
 // In-memory (abhi bas demo k liye)
 let receivedCoordinates = [];
 let receivedData = [];

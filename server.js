@@ -4,6 +4,7 @@ const PORT = process.env.PORT || 5000;
 const dotenv = require("dotenv");
 dotenv.config();
 const cors = require("cors");
+const cron = require("node-cron");
 
 const corsOptions = {
   origin: [
@@ -19,9 +20,50 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+const cron = require("node-cron");
+
 // In-memory (abhi bas demo k liye)
 let receivedCoordinates = [];
 let receivedData = [];
+
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memoryUsage: process.memoryUsage(),
+  });
+});
+
+// Schedule a cron job to ping the server every 14 minutes
+// This prevents free hosting platforms from putting the app to sleep
+cron.schedule("*/14 * * * *", () => {
+  console.log("Running keep-alive ping at:", new Date().toISOString());
+
+  const https = require("https");
+  const url = process.env.APP_URL || `http://localhost:${PORT}`;
+
+  if (url.startsWith("http://")) {
+    const http = require("http");
+    http
+      .get(`${url}/api/health`, (resp) => {
+        console.log("Keep-alive ping successful, status:", resp.statusCode);
+      })
+      .on("error", (err) => {
+        console.log("Keep-alive ping failed:", err.message);
+      });
+  }
+  // For HTTPS URLs
+  else if (url.startsWith("https://")) {
+    https
+      .get(`${url}/api/health`, (resp) => {
+        console.log("Keep-alive ping successful, status:", resp.statusCode);
+      })
+      .on("error", (err) => {
+        console.log("Keep-alive ping failed:", err.message);
+      });
+  }
+});
 
 // endpoint to receive coordinates and area
 app.post("/api/receive-coordinates", async (req, res) => {
@@ -88,7 +130,7 @@ app.get("/api/get-coordinates/:farmerId", async (req, res) => {
   }
 });
 
-// // to get the latest coordinates
+// to get the latest coordinates
 app.get("/api/get-coordinates", async (req, res) => {
   try {
     if (receivedData.length === 0) {
@@ -264,6 +306,7 @@ function notifyClients(notification) {
     client.res.write(`data: ${JSON.stringify(notification)}\n\n`);
   });
 }
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Test endpoint: http://localhost:${PORT}/api/test`);
@@ -279,4 +322,5 @@ app.listen(PORT, () => {
   console.log(
     `Notifications endpoint: GET http://localhost:${PORT}/api/notifications`
   );
+  console.log(`Health check endpoint: GET http://localhost:${PORT}/api/health`);
 });

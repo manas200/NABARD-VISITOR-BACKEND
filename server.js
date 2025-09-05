@@ -12,6 +12,7 @@ const corsOptions = {
     "http://localhost:5175",
     "https://nabard-visitor-frontend.vercel.app",
     "https://nabard-visitor-frontend-git-main-manas-chaturvedis-projects.vercel.app",
+    "https://nabard-sigma.vercel.app/",
   ],
   credentials: true,
   optionsSuccessStatus: 200,
